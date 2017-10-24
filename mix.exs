@@ -35,6 +35,7 @@ defmodule Packex.Mixfile do
       {:phoenix, "~> 1.3.0"},
       {:phoenix_pubsub, "~> 1.0"},
       {:gettext, "~> 0.11"},
+      {:phoenix_swagger, "~> 0.6.2"},
       {:cowboy, "~> 1.0"},
       {:httpoison, "~> 0.13"},
       {:uuid, "~> 1.1"}

@@ -1,6 +1,12 @@
 defmodule PackexWeb.PackagesController do
   use PackexWeb, :controller
+  use PhoenixSwagger
 
+  swagger_path(:create) do
+    post "/packages"
+    description "Create a Package"
+    response 201, "Created"
+  end
   def create(conn, params) do
     id =
       params
@@ -12,6 +18,15 @@ defmodule PackexWeb.PackagesController do
     |> send_resp(201, "")
   end
 
+  swagger_path(:show) do
+    get "/packages/{id}"
+    description "Get a Package"
+    parameters do
+      id :path, :string, "Package identifier", required: true
+    end
+    response 200, "Ok"
+    response 404, "Not found"
+  end
   def show(conn, %{"id" => id} = params) do
     case Packex.Store.read(id) do
       nil -> send_resp(conn, 404, "")
@@ -19,6 +34,15 @@ defmodule PackexWeb.PackagesController do
     end
   end
 
+  swagger_path(:update) do
+    put "/packages/{id}"
+    description "Update a Package"
+    parameters do
+      id :path, :string, "Package identifier", required: true
+    end
+    response 200, "Ok"
+    response 404, "Not found"
+  end
   def update(conn, params) do
     params =
       params
@@ -30,6 +54,15 @@ defmodule PackexWeb.PackagesController do
     end
   end
 
+  swagger_path(:delete) do
+    delete "/packages/{id}"
+    description "Delete a Package"
+    parameters do
+      id :path, :string, "Package identifier", required: true
+    end
+    response 204, "No content"
+    response 404, "Not found"
+  end
   def delete(conn, %{"id" => id}) do
     case Packex.Store.delete(id) do
       true -> send_resp(conn, 204, "")
@@ -37,7 +70,14 @@ defmodule PackexWeb.PackagesController do
     end
   end
 
+  swagger_path(:index) do
+    get "/packages"
+    description "Get All Packages"
+    response 200, "Ok"
+  end
   def index(conn, _params), do: json(conn, Packex.Store.read_all())
+
+  # Private functions
 
   defp populate_products(package) do
     Map.replace(package,
