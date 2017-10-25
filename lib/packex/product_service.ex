@@ -3,7 +3,9 @@ defmodule Packex.ProductService do
 
   @moduledoc """
   A product information server.
-  
+
+  Note, this server uses an external service to obtain the product information. The external service frequently delays
+  its responses which causes calls to timeout.
   """
 
   @auth_header ["Authorization": "Basic " <> Base.encode64("user" <> ":" <> "pass")]
@@ -11,10 +13,16 @@ defmodule Packex.ProductService do
 
   # Client API
 
+  @doc """
+  Start the Product Service server.
+  """
   def start_link(_arg), do: GenServer.start_link(__MODULE__, nil, name: __MODULE__)
 
   @doc """
   The product information associated with `id` (or `nil` if such information does not exist).
+
+  We cache this information, fetching it from the external product service only if necessary (the information provided
+  by the external service is only ever added to).
   """
   def product_info(id), do: GenServer.call(__MODULE__, {:product_info, id})
 
@@ -22,10 +30,6 @@ defmodule Packex.ProductService do
 
   def init(_arg), do: {:ok, %{}}
 
-  @doc """
-  Retrieve the product information associated with `id`. This server caches this information, fetching it from the
-  external product service if necessary (the information provided by the external service is only ever added to).
-  """
   def handle_call({:product_info, id}, _from, products) do
     case Map.has_key?(products, id) do
       true -> {:reply, Map.get(products, id), products}
